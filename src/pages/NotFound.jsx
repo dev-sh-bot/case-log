@@ -47,7 +47,7 @@ const NotFound = () => {
         {/* Quote */}
         <div className="mb-8 p-6 bg-white dark:bg-facebook-card rounded-xl shadow-sm border border-slate-200 dark:border-facebook-border">
           <blockquote className="text-slate-600 dark:text-facebook-textSecondary italic">
-            "The only impossible journey is the one you never begin."
+            &quot;The only impossible journey is the one you never begin.&quot;
           </blockquote>
           <cite className="block mt-2 text-sm text-slate-500 dark:text-facebook-textMuted">
             — Tony Robbins
@@ -56,14 +56,14 @@ const NotFound = () => {
 
         {/* Description */}
         <p className="text-slate-600 dark:text-facebook-textSecondary mb-8">
-          The page you're looking for doesn't exist. But don't worry, every great journey starts with a single step.
+          The page you&apos;re looking for doesn&apos;t exist. But don&apos;t worry, every great journey starts with a single step.
         </p>
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             to="/"
-            className="flex items-center justify-center px-6 py-3 bg-slate-800 dark:bg-facebook-dark text-white rounded-lg hover:bg-slate-700 dark:hover:bg-facebook-hover transition-colors"
+            className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg shadow-md hover:shadow-lg transition-all"
           >
             <FaHome className="mr-2" />
             Go Home
@@ -71,7 +71,7 @@ const NotFound = () => {
           
           <button
             onClick={() => window.history.back()}
-            className="flex items-center justify-center px-6 py-3 border border-slate-300 dark:border-facebook-border text-slate-700 dark:text-facebook-text rounded-lg hover:bg-slate-50 dark:hover:bg-facebook-surface transition-colors"
+            className="flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-facebook-border text-gray-700 dark:text-facebook-text bg-white dark:bg-facebook-surface rounded-lg hover:bg-gray-50 dark:hover:bg-facebook-hover shadow-sm hover:shadow-md transition-all"
           >
             <FaArrowLeft className="mr-2" />
             Go Back

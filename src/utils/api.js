@@ -1,85 +1,107 @@
-// Real API service
+// Real API service using axios
+import axios from 'axios';
 import { API_URL } from './constants';
 
-// Helper function for making API requests
-const apiRequest = async (endpoint, options = {}) => {
-  const url = `${API_URL}${endpoint}`;
-  const config = {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  };
+// Create axios instance with default configuration
+const apiClient = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
-  // Add auth token if available
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  try {
-    const response = await fetch(url, config);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+// Request interceptor to add auth token
+apiClient.interceptors.request.use(
+  (config) => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      config.headers.Authorization = `Bearer ${user.token}`;
+      config.headers.Accept = 'application/json';
     }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-    const data = await response.json();
-    return data;
-  } catch (error) {
+// Response interceptor to handle errors
+apiClient.interceptors.response.use(
+  (response) => {
+    return response.data;
+  },
+  (error) => {
     console.error('API request failed:', error);
     throw error;
   }
-};
+);
 
 // API functions
 export const api = {
-  // GET /manager-list - returns id and name
+  // GET /admin/manager-list - returns id and name
   async getManagerList() {
-    return await apiRequest('manager-list');
+    return await apiClient.get('admin/managers-list');
   },
 
-  // GET /managers - returns full manager data
+  // GET /admin/managers - returns full manager data
   async getManagers(queryParams = '') {
-    const endpoint = queryParams ? `managers?${queryParams}` : 'managers';
-    return await apiRequest(endpoint);
+    const endpoint = queryParams ? `admin/managers?${queryParams}` : 'admin/managers';
+    return await apiClient.get(endpoint);
   },
 
-  // GET /technicians - returns full technician data
+  // GET /admin/technicians - returns full technician data
   async getTechnicians(queryParams = '') {
-    const endpoint = queryParams ? `technicians?${queryParams}` : 'technicians';
-    return await apiRequest(endpoint);
+    const endpoint = queryParams ? `admin/technicians?${queryParams}` : 'admin/technicians';
+    return await apiClient.get(endpoint);
   },
 
-  // POST /managers - create new manager
+  // POST /admin/managers - create new manager
   async createManager(managerData) {
-    return await apiRequest('manager', {
-      method: 'POST',
-      body: JSON.stringify(managerData),
-    });
+    return await apiClient.post('admin/managers', managerData);
   },
 
-  // POST /technicians - create new technician
+  // POST /admin/technicians - create new technician
   async createTechnician(technicianData) {
-    return await apiRequest('technician', {
-      method: 'POST',
-      body: JSON.stringify(technicianData),
-    });
+    return await apiClient.post('admin/technicians', technicianData);
+  },
+
+  // PUT /admin/managers/:id - update manager
+  async updateManager(id, managerData) {
+    return await apiClient.put(`admin/managers/${id}`, managerData);
+  },
+
+  // PUT /admin/technicians/:id - update technician
+  async updateTechnician(id, technicianData) {
+    return await apiClient.put(`admin/technicians/${id}`, technicianData);
+  },
+
+  // DELETE /admin/managers/:id - delete manager
+  async deleteManager(id) {
+    return await apiClient.delete(`admin/managers/${id}`);
+  },
+
+  // DELETE /admin/technicians/:id - delete technician
+  async deleteTechnician(id) {
+    return await apiClient.delete(`admin/technicians/${id}`);
   },
 
   // Authentication endpoints
   async login(credentials) {
-    return await apiRequest('admin/signin', {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-    });
+    return await apiClient.post('admin/signin', credentials);
   },
 
-  async logout() {
-    return await apiRequest('auth/logout', {
-      method: 'POST',
-    });
+  // Dashboard data
+  async getDashboardData() {
+    return await apiClient.get('admin/dashboard');
+  },
+
+  // Settings
+  async getSettings() {
+    return await apiClient.get('admin/settings');
+  },
+
+  async updateSettings(settingsData) {
+    return await apiClient.put('admin/settings', settingsData);
   },
 };
 

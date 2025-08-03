@@ -167,19 +167,18 @@ export default function Sidebar({ isExpanded, setIsExpanded }) {
       {/* Header / Logo */}
       <div
         className={`
-          flex items-center bg-slate-800 dark:bg-facebook-dark
-          ${isExpanded ? "justify-between px-4" : "justify-center"}
-          h-20 shadow-sm
+          flex items-center justify-center bg-slate-800 dark:bg-facebook-dark h-24 shadow-sm transition-all duration-300
         `}
       >
-        <div className="w-10 h-10 p-1 rounded-full">
-          <img src={logo} alt="Logo" className="w-10 object-contain" />
+        <div className="flex items-center justify-center">
+          <img 
+            src={logo} 
+            alt="Logo" 
+            className={`object-contain transition-all duration-300 ${
+              isExpanded ? 'w-40 h-40' : 'w-10 h-10'
+            }`} 
+          />
         </div>
-        {isExpanded && (
-          <div className="flex-1 flex items-center justify-center gap-3">
-            <h1 className="text-2xl font-bold text-white whitespace-nowrap text-inherit overflow-hidden">CASE LOG</h1>
-          </div>
-        )}
       </div>
 
       {/* Main Nav Items */}

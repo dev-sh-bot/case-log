@@ -61,17 +61,23 @@ const DropdownMenu = React.memo(({ options, menuButtonLabel, spaceBetweenInPerce
         overflowY: 'auto',
         display: isOpen ? 'block' : 'none',
         // Animations are handled via CSS classes
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }), [menuPosition, isOpen]);
 
     return (
         <div className="relative inline-block text-left">
-            <button ref={buttonRef} onClick={toggleMenu}>
+            <button 
+                ref={buttonRef} 
+                onClick={toggleMenu}
+                className="p-2 text-gray-700 dark:text-facebook-text hover:bg-gray-100 dark:hover:bg-facebook-hover rounded-lg transition-colors"
+            >
                 {menuButtonLabel}
             </button>
 
             <div
                 ref={menuRef}
-                className={`absolute z-10 right-0 ${widthAsClass} origin-top-right rounded-xl bg-white dark:bg-facebook-card shadow-lg dark:shadow-gray-900/20 ring-1 ring-black ring-opacity-5 dark:ring-facebook-border ${isOpen ? 'fade-in' : 'fade-out'}`}
+                className={`absolute z-10 right-0 ${widthAsClass} origin-top-right rounded-xl bg-white dark:bg-facebook-card shadow-lg dark:shadow-gray-900/20 ring-1 ring-gray-200 dark:ring-facebook-border ${isOpen ? 'fade-in' : 'fade-out'}`}
                 style={menuStyle}
             >
                 <ul className="py-2">

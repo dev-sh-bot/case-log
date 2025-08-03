@@ -31,12 +31,14 @@ const ManagersList = () => {
       
       const response = await api.getManagers(queryParams.toString());
       
-      if (response.success) {
+      // Handle Laravel pagination response structure
+      if (response && response.data) {
         setManagers(response.data || []);
         setTotalItems(response.total || 0);
         setTotalPages(response.last_page || 0);
+        setCurrentPage(response.current_page || 1);
       } else {
-        throw new Error(response.message || 'Failed to fetch managers');
+        throw new Error('Invalid response format');
       }
     } catch (error) {
       console.error('Error fetching managers:', error);
@@ -48,11 +50,6 @@ const ManagersList = () => {
       setLoading(false);
     }
   };
-
-  // Initial data fetch
-  useEffect(() => {
-    fetchManagers(currentPage, searchTerm);
-  }, []);
 
   // Fetch data when page or search changes
   useEffect(() => {
@@ -82,7 +79,7 @@ const ManagersList = () => {
       reset
     } = useForm({
       defaultValues: {
-        user_name: editingManager?.fullName || '',
+        name: editingManager?.name || '',
         email: editingManager?.email || '',
         password: ''
       }
@@ -94,7 +91,7 @@ const ManagersList = () => {
         if (editingManager) {
           // Update existing manager
           const response = await api.updateManager(editingManager.id, data);
-          if (response.success) {
+          if (response && response.data) {
             triggerToast('Manager updated successfully', 'success');
             // Refresh the managers list
             fetchManagers(currentPage, searchTerm);
@@ -104,8 +101,8 @@ const ManagersList = () => {
         } else {
           // Add new manager
           const response = await api.createManager(data);
-          if (response.success) {
-            triggerToast(response.message, 'success');
+          if (response && response.data) {
+            triggerToast('Manager created successfully', 'success');
             // Refresh the managers list
             fetchManagers(currentPage, searchTerm);
           } else {
@@ -126,15 +123,15 @@ const ManagersList = () => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-full max-w-md">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        <div className="bg-white dark:bg-facebook-card rounded-lg p-6 w-full max-w-md border border-gray-200 dark:border-facebook-border">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-facebook-text mb-4">
             {editingManager ? 'Edit Manager' : 'Add New Manager'}
           </h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* User Name Field */}
+            {/* Name Field */}
             <div>
-              <label htmlFor="user_name" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-facebook-text mb-2">
                 Full Name *
               </label>
               <div className="relative">
@@ -143,8 +140,8 @@ const ManagersList = () => {
                 </div>
                 <input
                   type="text"
-                  id="user_name"
-                  {...register('user_name', {
+                  id="name"
+                  {...register('name', {
                     required: 'Full name is required',
                     minLength: {
                       value: 2,
@@ -155,19 +152,19 @@ const ManagersList = () => {
                       message: 'Full name must be less than 50 characters'
                     }
                   })}
-                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.user_name ? 'border-red-300' : 'border-gray-300'
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-facebook-surface text-gray-900 dark:text-facebook-text ${errors.name ? 'border-red-300 dark:border-red-500' : 'border-gray-300 dark:border-facebook-border'
                     }`}
                   placeholder="Enter full name"
                 />
               </div>
-              {errors.user_name && (
-                <p className="mt-1 text-sm text-red-600">{errors.user_name.message}</p>
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
               )}
             </div>
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-facebook-text mb-2">
                 Email Address *
               </label>
               <input
@@ -180,7 +177,7 @@ const ManagersList = () => {
                     message: 'Please enter a valid email address'
                   }
                 })}
-                className={`block w-full px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.email ? 'border-red-300' : 'border-gray-300'
+                className={`block w-full px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-facebook-surface text-gray-900 dark:text-facebook-text ${errors.email ? 'border-red-300 dark:border-red-500' : 'border-gray-300 dark:border-facebook-border'
                   }`}
                 placeholder="Enter email address"
               />
@@ -192,7 +189,7 @@ const ManagersList = () => {
             {/* Password Field */}
             {!editingManager && (
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-facebook-text mb-2">
                   Password *
                 </label>
                 <input
@@ -209,14 +206,14 @@ const ManagersList = () => {
                       message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number'
                     }
                   })}
-                  className={`block w-full px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.password ? 'border-red-300' : 'border-gray-300'
+                  className={`block w-full px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-facebook-surface text-gray-900 dark:text-facebook-text ${errors.password ? 'border-red-300 dark:border-red-500' : 'border-gray-300 dark:border-facebook-border'
                     }`}
                   placeholder="Enter password"
                 />
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
                 )}
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-gray-500 dark:text-facebook-textMuted">
                   Password must be at least 8 characters with uppercase, lowercase, and number
                 </p>
               </div>
@@ -230,14 +227,14 @@ const ManagersList = () => {
                   setEditingManager(null);
                   reset();
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-facebook-textSecondary bg-gray-100 dark:bg-facebook-surface rounded-lg hover:bg-gray-200 dark:hover:bg-facebook-hover transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 bg-slate-800 dark:bg-facebook-dark hover:bg-slate-700 dark:hover:bg-facebook-hover"
+                className="flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg transition-all disabled:opacity-50 shadow-md hover:shadow-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
               >
                 {isSubmitting ? (
                   <>
@@ -259,7 +256,7 @@ const ManagersList = () => {
   };
 
   return (
-    <div className="page-section">
+    <div className="page-section p-6">
 
       {/* Header */}
       <div className="page-header mb-2">
@@ -273,13 +270,13 @@ const ManagersList = () => {
               placeholder="Search managers..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-facebook-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-facebook-surface text-gray-900 dark:text-facebook-text placeholder-gray-500 dark:placeholder-facebook-textMuted"
             />
           </div>
         </div>
         <button
           onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center px-4 py-2 text-white rounded-lg transition-colors bg-slate-800 dark:bg-facebook-dark hover:bg-slate-700 dark:hover:bg-facebook-hover"
+          className="flex items-center px-4 py-2 text-white rounded-lg transition-all shadow-md hover:shadow-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
         >
           <FaPlus className="mr-2" size={14} />
           Add Manager
@@ -287,47 +284,47 @@ const ManagersList = () => {
       </div>
 
       {/* Managers Table */}
-      <div className="page-card overflow-hidden">
+      <div className="page-card overflow-hidden shadow-sm border border-gray-200 dark:border-facebook-border">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 dark:bg-facebook-surface">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-facebook-textSecondary uppercase tracking-wider">
                   ID
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-facebook-textSecondary uppercase tracking-wider">
                   Full Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-facebook-textSecondary uppercase tracking-wider">
                   Email
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-facebook-textSecondary uppercase tracking-wider">
                   Created Date
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-facebook-card divide-y divide-gray-200 dark:divide-facebook-border">
               {loading ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-facebook-textSecondary">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                    <p className="text-lg font-medium">Loading managers...</p>
+                    <p className="text-lg font-medium text-gray-700 dark:text-facebook-text">Loading managers...</p>
                   </td>
                 </tr>
               ) : managers.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-facebook-textSecondary">
                     <FaUserTie className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <p className="text-lg font-medium">No managers found</p>
-                    <p className="text-sm">
+                    <p className="text-lg font-medium text-gray-700 dark:text-facebook-text">No managers found</p>
+                    <p className="text-sm text-gray-600 dark:text-facebook-textSecondary">
                       {searchTerm ? 'Try adjusting your search terms' : 'Get started by adding your first manager'}
                     </p>
                   </td>
                 </tr>
               ) : (
                 managers.map((manager) => (
-                  <tr key={manager.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr key={manager.id} className="hover:bg-gray-50 dark:hover:bg-facebook-hover">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-facebook-text">
                       {manager.id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -338,16 +335,16 @@ const ManagersList = () => {
                           </div>
                         </div>
                         <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">
-                            {manager.full_name || manager.fullName}
+                          <div className="text-sm font-medium text-gray-900 dark:text-facebook-text">
+                            {manager.name}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-facebook-text">
                       {manager.email}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-facebook-textSecondary">
                       {manager.created_at ? new Date(manager.created_at).toLocaleDateString() : 'N/A'}
                     </td>
                   </tr>

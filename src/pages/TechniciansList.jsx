@@ -10,7 +10,6 @@ const TechniciansList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedManager, setSelectedManager] = useState('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingTechnician, setEditingTechnician] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [technicians, setTechnicians] = useState([]);
   const [managers, setManagers] = useState([]);
@@ -37,12 +36,14 @@ const TechniciansList = () => {
       
       const response = await api.getTechnicians(queryParams.toString());
       
-      if (response.success) {
+      // Handle Laravel pagination response structure
+      if (response && response.data) {
         setTechnicians(response.data || []);
         setTotalItems(response.total || 0);
         setTotalPages(response.last_page || 0);
+        setCurrentPage(response.current_page || 1);
       } else {
-        throw new Error(response.message || 'Failed to fetch technicians');
+        throw new Error('Invalid response format');
       }
     } catch (error) {
       console.error('Error fetching technicians:', error);
@@ -59,11 +60,17 @@ const TechniciansList = () => {
   const fetchManagers = async () => {
     try {
       const response = await api.getManagerList();
-      if (response.success) {
+      // Handle simple array response for manager list
+      if (Array.isArray(response)) {
+        setManagers(response || []);
+      } else if (response && response.data) {
         setManagers(response.data || []);
+      } else {
+        setManagers([]);
       }
     } catch (error) {
       console.error('Error fetching managers:', error);
+      setManagers([]);
     }
   };
 
@@ -108,9 +115,9 @@ const TechniciansList = () => {
       watch
     } = useForm({
       defaultValues: {
-        user_name: editingTechnician?.fullName || '',
-        email: editingTechnician?.email || '',
-        manager_id: editingTechnician?.managerId || '',
+        name: '',
+        email: '',
+        manager_id: '',
         password: ''
       }
     });
@@ -120,35 +127,21 @@ const TechniciansList = () => {
     const onSubmit = async (data) => {
       setIsSubmitting(true);
       try {
-
-        if (editingTechnician) {
-          // Update existing technician
-          const response = await api.updateTechnician(editingTechnician.id, data);
-          if (response.success) {
-            triggerToast('Technician updated successfully', 'success');
-            // Refresh the technicians list
-            fetchTechnicians(currentPage, searchTerm, selectedManager);
-          } else {
-            throw new Error('Failed to update technician');
-          }
+        // Add new technician
+        const response = await api.createTechnician(data);
+        if (response && response.data) {
+          triggerToast('Technician created successfully', 'success');
+          // Refresh the technicians list
+          fetchTechnicians(currentPage, searchTerm, selectedManager);
+          // Close modal and reset form on success
+          setIsAddModalOpen(false);
+          reset();
         } else {
-          // Add new technician
-          const response = await api.createTechnician(data);
-          if (response.success) {
-            triggerToast(response.message, 'success');
-            // Refresh the technicians list
-            fetchTechnicians(currentPage, searchTerm, selectedManager);
-          } else {
-            throw new Error('Failed to create technician');
-          }
+          throw new Error('Failed to create technician');
         }
-
-        setIsAddModalOpen(false);
-        setEditingTechnician(null);
-        reset();
       } catch (error) {
         console.error('Error saving technician:', error);
-        triggerToast(`Failed to ${editingTechnician ? 'update' : 'create'} technician`, 'error');
+        triggerToast('Failed to create technician', 'error');
       } finally {
         setIsSubmitting(false);
       }
@@ -156,15 +149,15 @@ const TechniciansList = () => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-full max-w-md">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            {editingTechnician ? 'Edit Technician' : 'Add New Technician'}
+        <div className="bg-white dark:bg-facebook-card rounded-lg p-6 w-full max-w-md border border-gray-200 dark:border-facebook-border">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-facebook-text mb-4">
+            Add New Technician
           </h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Manager Selection */}
             <div>
-              <label htmlFor="manager_id" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="manager_id" className="block text-sm font-medium text-gray-700 dark:text-facebook-text mb-2">
                 Assign Manager *
               </label>
               <div className="relative">
@@ -176,7 +169,7 @@ const TechniciansList = () => {
                   {...register('manager_id', {
                     required: 'Please select a manager'
                   })}
-                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.manager_id ? 'border-red-300' : 'border-gray-300'
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-facebook-surface text-gray-900 dark:text-facebook-text ${errors.manager_id ? 'border-red-300 dark:border-red-500' : 'border-gray-300 dark:border-facebook-border'
                     }`}
                 >
                   <option value="">Select a manager</option>
@@ -191,7 +184,7 @@ const TechniciansList = () => {
                 <p className="mt-1 text-sm text-red-600">{errors.manager_id.message}</p>
               )}
               {selectedManagerId && (
-                <p className="mt-1 text-sm text-green-600">
+                <p className="mt-1 text-sm text-green-600 dark:text-green-400">
                   ✓ Assigned to {managers.find(m => m.id === parseInt(selectedManagerId))?.name}
                 </p>
               )}
@@ -199,7 +192,7 @@ const TechniciansList = () => {
 
             {/* User Name Field */}
             <div>
-              <label htmlFor="user_name" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-facebook-text mb-2">
                 Full Name *
               </label>
               <div className="relative">
@@ -208,8 +201,8 @@ const TechniciansList = () => {
                 </div>
                 <input
                   type="text"
-                  id="user_name"
-                  {...register('user_name', {
+                  id="name"
+                  {...register('name', {
                     required: 'Full name is required',
                     minLength: {
                       value: 2,
@@ -220,19 +213,19 @@ const TechniciansList = () => {
                       message: 'Full name must be less than 50 characters'
                     }
                   })}
-                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.user_name ? 'border-red-300' : 'border-gray-300'
+                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-facebook-surface text-gray-900 dark:text-facebook-text ${errors.name ? 'border-red-300 dark:border-red-500' : 'border-gray-300 dark:border-facebook-border'
                     }`}
                   placeholder="Enter full name"
                 />
               </div>
-              {errors.user_name && (
-                <p className="mt-1 text-sm text-red-600">{errors.user_name.message}</p>
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
               )}
             </div>
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-facebook-text mb-2">
                 Email Address *
               </label>
               <input
@@ -245,7 +238,7 @@ const TechniciansList = () => {
                     message: 'Please enter a valid email address'
                   }
                 })}
-                className={`block w-full px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.email ? 'border-red-300' : 'border-gray-300'
+                className={`block w-full px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-facebook-surface text-gray-900 dark:text-facebook-text ${errors.email ? 'border-red-300 dark:border-red-500' : 'border-gray-300 dark:border-facebook-border'
                   }`}
                 placeholder="Enter email address"
               />
@@ -255,64 +248,61 @@ const TechniciansList = () => {
             </div>
 
             {/* Password Field */}
-            {!editingTechnician && (
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  Password *
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  {...register('password', {
-                    required: 'Password is required',
-                    minLength: {
-                      value: 8,
-                      message: 'Password must be at least 8 characters'
-                    },
-                    pattern: {
-                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                      message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number'
-                    }
-                  })}
-                  className={`block w-full px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.password ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                  placeholder="Enter password"
-                />
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-                )}
-                <p className="mt-1 text-xs text-gray-500">
-                  Password must be at least 8 characters with uppercase, lowercase, and number
-                </p>
-              </div>
-            )}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-facebook-text mb-2">
+                Password *
+              </label>
+              <input
+                type="password"
+                id="password"
+                {...register('password', {
+                  required: 'Password is required',
+                  minLength: {
+                    value: 8,
+                    message: 'Password must be at least 8 characters'
+                  },
+                  pattern: {
+                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+                    message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+                  }
+                })}
+                className={`block w-full px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-facebook-surface text-gray-900 dark:text-facebook-text ${errors.password ? 'border-red-300 dark:border-red-500' : 'border-gray-300 dark:border-facebook-border'
+                  }`}
+                placeholder="Enter password"
+              />
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              )}
+              <p className="mt-1 text-xs text-gray-500 dark:text-facebook-textMuted">
+                Password must be at least 8 characters with uppercase, lowercase, and number
+              </p>
+            </div>
 
             <div className="flex justify-end space-x-3 pt-4">
               <button
                 type="button"
                 onClick={() => {
                   setIsAddModalOpen(false);
-                  setEditingTechnician(null);
                   reset();
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-facebook-textSecondary bg-gray-100 dark:bg-facebook-surface rounded-lg hover:bg-gray-200 dark:hover:bg-facebook-hover transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 bg-slate-800 dark:bg-facebook-dark hover:bg-slate-700 dark:hover:bg-facebook-hover"
+                className="flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg transition-all disabled:opacity-50 shadow-md hover:shadow-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
               >
                 {isSubmitting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    {editingTechnician ? 'Updating...' : 'Creating...'}
+                    Creating...
                   </>
                 ) : (
                   <>
                     <FaSave className="mr-2" />
-                    {editingTechnician ? 'Update Technician' : 'Create Technician'}
+                    Create Technician
                   </>
                 )}
               </button>
@@ -324,7 +314,7 @@ const TechniciansList = () => {
   };
 
   return (
-    <div className="page-section">
+    <div className="page-section p-6">
 
       {/* Header */}
       <div className="page-header mb-2">
@@ -340,7 +330,7 @@ const TechniciansList = () => {
               placeholder="Search technicians..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-facebook-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-facebook-surface text-gray-900 dark:text-facebook-text placeholder-gray-500 dark:placeholder-facebook-textMuted"
             />
           </div>
 
@@ -352,7 +342,7 @@ const TechniciansList = () => {
             <select
               value={selectedManager}
               onChange={handleManagerFilterChange}
-              className="pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white min-w-[180px]"
+              className="pl-10 pr-8 py-2 border border-gray-300 dark:border-facebook-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-facebook-surface text-gray-900 dark:text-facebook-text min-w-[180px]"
             >
               <option value="all">All Managers</option>
               {managers.map(manager => (
@@ -365,7 +355,7 @@ const TechniciansList = () => {
         </div>
         <button
           onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center px-4 py-2 text-white rounded-lg transition-colors bg-slate-800 dark:bg-facebook-dark hover:bg-slate-700 dark:hover:bg-facebook-hover"
+          className="flex items-center px-4 py-2 text-white rounded-lg transition-all shadow-md hover:shadow-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
         >
           <FaPlus className="mr-2" size={14} />
           Add Technician
@@ -375,39 +365,42 @@ const TechniciansList = () => {
 
 
       {/* Technicians Table */}
-      <div className="page-card overflow-hidden">
+      <div className="page-card overflow-hidden shadow-sm border border-gray-200 dark:border-facebook-border">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 dark:bg-facebook-surface">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-facebook-textSecondary uppercase tracking-wider">
                   ID
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-facebook-textSecondary uppercase tracking-wider">
                   Full Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-facebook-textSecondary uppercase tracking-wider">
                   Email
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-facebook-textSecondary uppercase tracking-wider">
+                  Manager
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-facebook-textSecondary uppercase tracking-wider">
                   Created Date
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-facebook-card divide-y divide-gray-200 dark:divide-facebook-border">
               {loading ? (
                 <tr>
-                  <td colSpan="8" className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500 dark:text-facebook-textSecondary">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                    <p className="text-lg font-medium">Loading technicians...</p>
+                    <p className="text-lg font-medium text-gray-700 dark:text-facebook-text">Loading technicians...</p>
                   </td>
                 </tr>
               ) : technicians.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500 dark:text-facebook-textSecondary">
                     <FaTools className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <p className="text-lg font-medium">No technicians found</p>
-                    <p className="text-sm">
+                    <p className="text-lg font-medium text-gray-700 dark:text-facebook-text">No technicians found</p>
+                    <p className="text-sm text-gray-600 dark:text-facebook-textSecondary">
                       {searchTerm || selectedManager !== 'all'
                         ? 'Try adjusting your search or filter criteria'
                         : 'Get started by adding your first technician'
@@ -417,8 +410,8 @@ const TechniciansList = () => {
                 </tr>
               ) : (
                 technicians.map((technician) => (
-                    <tr key={technician.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={technician.id} className="hover:bg-gray-50 dark:hover:bg-facebook-hover">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-facebook-text">
                         {technician.id}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -429,16 +422,33 @@ const TechniciansList = () => {
                             </div>
                           </div>
                           <div className="ml-3">
-                            <div className="text-sm font-medium text-gray-900">
-                              {technician.full_name || technician.fullName}
+                            <div className="text-sm font-medium text-gray-900 dark:text-facebook-text">
+                              {technician.name}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-facebook-text">
                         {technician.email}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-facebook-text">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-6 w-6">
+                            <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center">
+                              <FaUserTie className="h-3 w-3 text-green-600" />
+                            </div>
+                          </div>
+                          <div className="ml-2">
+                            <div className="text-sm font-medium text-gray-900 dark:text-facebook-text">
+                              {technician.manager_name || 'N/A'}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-facebook-textMuted">
+                              {technician.manager_email || ''}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-facebook-textSecondary">
                         {technician.created_at ? new Date(technician.created_at).toLocaleDateString() : 'N/A'}
                       </td>
                     </tr>
@@ -462,7 +472,7 @@ const TechniciansList = () => {
         )}
       </div>
 
-      {/* Add/Edit Technician Modal */}
+      {/* Add Technician Modal */}
       {isAddModalOpen && <AddTechnicianModal />}
     </div>
   );

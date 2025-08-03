@@ -88,13 +88,10 @@ export const mockApi = {
   // GET /manager-list - returns id and name
   async getManagerList() {
     await delay(500); // Simulate network delay
-    return {
-      success: true,
-      data: mockManagers.map(manager => ({
-        id: manager.id,
-        name: manager.name
-      }))
-    };
+    return mockManagers.map(manager => ({
+      id: manager.id,
+      name: manager.name
+    }));
   },
 
   // GET /managers - returns full manager data
