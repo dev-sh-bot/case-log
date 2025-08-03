@@ -82,10 +82,10 @@ const NotFound = () => {
         <div className="mt-8 text-sm text-slate-500 dark:text-facebook-textMuted">
           <p>Need help? Contact our support team</p>
           <a 
-            href="mailto:support@caselogtech.com" 
+                            href="mailto:support@everpase.com" 
             className="text-blue-600 dark:text-blue-400 hover:underline"
           >
-            support@caselogtech.com
+            support@everpase.com
           </a>
         </div>
       </div>

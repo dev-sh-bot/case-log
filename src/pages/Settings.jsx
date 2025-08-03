@@ -17,7 +17,7 @@ const Settings = () => {
     // Profile Settings
     const [profileSettings, setProfileSettings] = useState({
         fullName: 'Admin User',
-        email: 'admin@caselogtech.com',
+        email: 'admin@everpase.com',
         role: 'System Administrator',
         timezone: 'UTC-05:00',
         dateFormat: 'MM/DD/YYYY',

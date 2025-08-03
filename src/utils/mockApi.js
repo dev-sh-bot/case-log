@@ -18,7 +18,7 @@ const mockTechnicians = [
   {
     id: 1,
     fullName: 'John Smith',
-    email: 'john.smith@caselogtech.com',
+    email: 'john.smith@everpase.com',
     managerName: 'Sarah Williams',
     managerId: 1,
     password: '********',
@@ -29,7 +29,7 @@ const mockTechnicians = [
   {
     id: 2,
     fullName: 'Emma Johnson',
-    email: 'emma.johnson@caselogtech.com',
+    email: 'emma.johnson@everpase.com',
     managerName: 'Mike Johnson',
     managerId: 2,
     password: '********',
@@ -40,7 +40,7 @@ const mockTechnicians = [
   {
     id: 3,
     fullName: 'David Brown',
-    email: 'david.brown@caselogtech.com',
+    email: 'david.brown@everpase.com',
     managerName: 'Lisa Anderson',
     managerId: 3,
     password: '********',
@@ -51,7 +51,7 @@ const mockTechnicians = [
   {
     id: 4,
     fullName: 'Sarah Wilson',
-    email: 'sarah.wilson@caselogtech.com',
+    email: 'sarah.wilson@everpase.com',
     managerName: 'Robert Wilson',
     managerId: 4,
     password: '********',
@@ -62,7 +62,7 @@ const mockTechnicians = [
   {
     id: 5,
     fullName: 'Michael Davis',
-    email: 'michael.davis@caselogtech.com',
+    email: 'michael.davis@everpase.com',
     managerName: 'Jennifer Davis',
     managerId: 5,
     password: '********',
@@ -73,7 +73,7 @@ const mockTechnicians = [
   {
     id: 6,
     fullName: 'Lisa Thompson',
-    email: 'lisa.thompson@caselogtech.com',
+    email: 'lisa.thompson@everpase.com',
     managerName: 'Sarah Williams',
     managerId: 1,
     password: '********',

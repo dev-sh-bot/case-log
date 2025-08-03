@@ -275,7 +275,7 @@ const Dashboard = () => {
       {/* Header */}
       <div className="page-header mb-6">
         <div>
-          <h1 className="page-title">CASE LOG Dashboard</h1>
+          <h1 className="page-title">EverPase Dashboard</h1>
           <p className="page-subtitle mt-1">
             Welcome back! Here&apos;s an overview of your case management system.
           </p>
