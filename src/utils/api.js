@@ -103,6 +103,11 @@ export const api = {
   async updateSettings(settingsData) {
     return await apiClient.put('admin/settings', settingsData);
   },
+
+  // Notifications
+  async createNotification(notificationData) {
+    return await apiClient.post('admin/notifications', notificationData);
+  },
 };
 
 export default api;

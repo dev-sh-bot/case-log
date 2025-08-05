@@ -13,6 +13,7 @@ import {
   FaCog,
   FaUserTie,
   FaTools,
+  FaBell,
 } from "react-icons/fa"
 import { LuLayoutDashboard, LuLogOut } from "react-icons/lu"
 
@@ -34,6 +35,11 @@ const menuItems = [
     title: "Technicians",
     path: "/technicians",
     icon: <FaTools />,
+  },
+  {
+    title: "Notifications",
+    path: "/notifications/create",
+    icon: <FaBell />,
   },
   {
     title: "Settings",

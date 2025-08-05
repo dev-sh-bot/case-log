@@ -237,7 +237,7 @@ const Dashboard = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="page-section p-6">
+      <div className="page-section">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <FaSpinner className="animate-spin mx-auto mb-4 text-blue-600" size={40} />
@@ -251,7 +251,7 @@ const Dashboard = () => {
   // Error state
   if (error) {
     return (
-      <div className="page-section p-6">
+      <div className="page-section">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <FaExclamationTriangle className="mx-auto mb-4 text-red-600" size={40} />
@@ -270,7 +270,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="page-section p-6">
+    <div className="page-section">
 
       {/* Header */}
       <div className="page-header mb-6">

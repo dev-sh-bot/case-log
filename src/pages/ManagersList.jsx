@@ -256,7 +256,7 @@ const ManagersList = () => {
   };
 
   return (
-    <div className="page-section p-6">
+    <div className="page-section">
 
       {/* Header */}
       <div className="page-header mb-2">

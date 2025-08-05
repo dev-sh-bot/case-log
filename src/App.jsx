@@ -16,6 +16,7 @@ const Login = React.lazy(() => import("./pages/Login"));
 const ManagersList = React.lazy(() => import("./pages/ManagersList"));
 const TechniciansList = React.lazy(() => import("./pages/TechniciansList"));
 const Settings = React.lazy(() => import("./pages/Settings"));
+const NotificationCreate = React.lazy(() => import("./pages/NotificationCreate"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
 const router = createBrowserRouter([
@@ -77,6 +78,21 @@ const router = createBrowserRouter([
     ),
     handle: {
       title: "Settings"
+    }
+  },
+  {
+    path: "/notifications/create",
+    element: (
+      <ProtectedRoute>
+        <Layout>
+          <React.Suspense fallback={<LoadingSpinner />}>
+            <NotificationCreate />
+          </React.Suspense>
+        </Layout>
+      </ProtectedRoute>
+    ),
+    handle: {
+      title: "Create Notification"
     }
   },
   {
