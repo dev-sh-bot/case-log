@@ -81,8 +81,8 @@ function SidebarItem({ item, isSidebarExpanded, onExpand }) {
             ${isSidebarExpanded ? "justify-between px-4" : "justify-center"}
             font-medium border-l-4
             ${isParentActive
-              ? "bg-blue-50 border-blue-600 text-blue-600"
-              : "border-transparent text-white hover:bg-gray-700 dark:hover:bg-facebook-hover"
+              ? "bg-blue-50 dark:bg-blue-900/20 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400"
+              : "border-transparent text-gray-700 dark:text-facebook-textSecondary hover:bg-gray-100 dark:hover:bg-facebook-hover hover:text-gray-900 dark:hover:text-facebook-text"
             }
           `}
         >
@@ -97,7 +97,7 @@ function SidebarItem({ item, isSidebarExpanded, onExpand }) {
           )}
         </button>
         {isOpen && isSidebarExpanded && (
-          <div className="flex flex-col ml-6 border-l border-gray-600 dark:border-facebook-border">
+          <div className="flex flex-col ml-6 border-l border-gray-200 dark:border-facebook-border">
             {subLinks.map((link, index) => (
               <NavLink
                 key={index}
@@ -109,8 +109,8 @@ function SidebarItem({ item, isSidebarExpanded, onExpand }) {
                     whitespace-nowrap overflow-hidden
                     border-l-4
                     ${isActive
-                    ? "bg-blue-50 border-blue-600 text-blue-600"
-                    : "border-transparent text-gray-300 hover:bg-gray-700 dark:hover:bg-facebook-hover"
+                    ? "bg-blue-50 dark:bg-blue-900/20 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400"
+                    : "border-transparent text-gray-600 dark:text-facebook-textMuted hover:bg-gray-100 dark:hover:bg-facebook-hover hover:text-gray-800 dark:hover:text-facebook-textSecondary"
                   }
                   `
                 }
@@ -134,8 +134,8 @@ function SidebarItem({ item, isSidebarExpanded, onExpand }) {
          ${isSidebarExpanded ? "justify-start px-4 gap-3" : "justify-center"}
          font-medium border-l-4
          ${isActive
-          ? "bg-blue-50 border-blue-600 text-blue-600"
-          : "border-transparent text-white hover:bg-gray-700 dark:hover:bg-facebook-hover"
+          ? "bg-blue-50 dark:bg-blue-900/20 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400"
+          : "border-transparent text-gray-700 dark:text-facebook-textSecondary hover:bg-gray-100 dark:hover:bg-facebook-hover hover:text-gray-900 dark:hover:text-facebook-text"
         }
         `
       }
@@ -165,7 +165,7 @@ export default function Sidebar({ isExpanded, setIsExpanded }) {
     <aside
       className={`
         sticky top-0 left-0 z-10
-        flex flex-col h-screen border-r border-gray-600 dark:border-facebook-border bg-slate-800 dark:bg-facebook-dark
+        flex flex-col h-screen border-r border-gray-200 dark:border-facebook-border bg-white dark:bg-facebook-card
         ${isExpanded ? "w-64" : "w-20"}
         transition-all duration-300 overflow-hidden
       `}
@@ -173,15 +173,15 @@ export default function Sidebar({ isExpanded, setIsExpanded }) {
       {/* Header / Logo */}
       <div
         className={`
-          flex items-center justify-center bg-slate-800 dark:bg-facebook-dark h-24 shadow-sm transition-all duration-300
+          flex items-center justify-center bg-gray-50 dark:bg-facebook-dark h-24 shadow-sm transition-all duration-300
         `}
       >
         <div className="flex items-center justify-center">
           <img 
             src={logo} 
             alt="Logo" 
-            className={`object-contain transition-all duration-300 ${
-              isExpanded ? 'w-40 h-40' : 'w-10 h-10'
+            className={`object-contain transition-all duration-300 filter brightness-90 contrast-110 saturate-125 hover:brightness-100 hover:contrast-125 dark:brightness-200 dark:contrast-150 dark:saturate-150 dark:hover:brightness-250 dark:hover:contrast-175 ${
+              isExpanded ? 'w-40' : 'w-10'
             }`} 
           />
         </div>
@@ -207,7 +207,7 @@ export default function Sidebar({ isExpanded, setIsExpanded }) {
           w-full h-10 flex items-center 
           ${isExpanded ? "justify-start px-4 gap-3" : "justify-center"}
           text-sm font-medium border-l-4
-          border-transparent text-white hover:bg-gray-700 dark:hover:bg-facebook-hover
+          border-transparent text-gray-700 dark:text-facebook-textSecondary hover:bg-gray-100 dark:hover:bg-facebook-hover hover:text-red-600 dark:hover:text-red-400
         `}
       >
         <LuLogOut className="text-base" />
@@ -215,7 +215,7 @@ export default function Sidebar({ isExpanded, setIsExpanded }) {
       </button>
 
       {/* Expand/Collapse Toggle */}
-      <div className="border-t border-gray-600 dark:border-facebook-border">
+      <div className="border-t border-gray-200 dark:border-facebook-border">
         <button
           onClick={() => setIsExpanded((prev) => !prev)}
           title={!isExpanded ? "Expand" : undefined}
@@ -223,7 +223,7 @@ export default function Sidebar({ isExpanded, setIsExpanded }) {
             w-full h-10 flex items-center 
             ${isExpanded ? "justify-start px-4 gap-3" : "justify-center"}
             text-sm font-medium border-l-4
-            border-transparent text-white hover:bg-gray-700 dark:hover:bg-facebook-hover
+            border-transparent text-gray-700 dark:text-facebook-textSecondary hover:bg-gray-100 dark:hover:bg-facebook-hover hover:text-gray-900 dark:hover:text-facebook-text
           `}
         >
           {isExpanded ? <FaChevronLeft /> : <FaChevronRight />}

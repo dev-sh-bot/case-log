@@ -90,7 +90,7 @@ const Login = () => {
                                 visible={true}
                                 height="24"
                                 width="24"
-                                colors={['#8484c1', "#8484c1", "#8484c1", "#8484c1", "#8484c1"]}
+                                colors={['#3B82F6', "#2563EB", "#1D4ED8", "#1E40AF", "#1E3A8A"]}
                                 wrapperStyle={{ margin: "0 auto" }}
                             />
                             :

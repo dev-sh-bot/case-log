@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { 
   FaUserTie, 
   FaTools, 
@@ -10,12 +11,14 @@ import {
 } from 'react-icons/fa';
 import { api } from '../utils/api';
 import { triggerToast } from '../utils/helper';
+import CaseChart from '../components/CaseChart';
 
 const Dashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('week');
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const isDark = useSelector(state => state.theme.isDark);
 
   // Fetch dashboard data from API
   const fetchDashboardData = async () => {
@@ -198,26 +201,26 @@ const Dashboard = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'completed':
-        return 'text-green-600 bg-green-100';
+        return isDark ? 'text-green-400 bg-green-900/20' : 'text-green-600 bg-green-100';
       case 'in_progress':
-        return 'text-blue-600 bg-blue-100';
+        return isDark ? 'text-blue-400 bg-blue-900/20' : 'text-blue-600 bg-blue-100';
       case 'pending':
-        return 'text-yellow-600 bg-yellow-100';
+        return isDark ? 'text-yellow-400 bg-yellow-900/20' : 'text-yellow-600 bg-yellow-100';
       default:
-        return 'text-gray-600 bg-gray-100';
+        return isDark ? 'text-facebook-textSecondary bg-facebook-surface' : 'text-gray-600 bg-gray-100';
     }
   };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
       case 'high':
-        return 'text-red-600 bg-red-100';
+        return isDark ? 'text-red-400 bg-red-900/20' : 'text-red-600 bg-red-100';
       case 'medium':
-        return 'text-yellow-600 bg-yellow-100';
+        return isDark ? 'text-yellow-400 bg-yellow-900/20' : 'text-yellow-600 bg-yellow-100';
       case 'low':
-        return 'text-green-600 bg-green-100';
+        return isDark ? 'text-green-400 bg-green-900/20' : 'text-green-600 bg-green-100';
       default:
-        return 'text-gray-600 bg-gray-100';
+        return isDark ? 'text-facebook-textSecondary bg-facebook-surface' : 'text-gray-600 bg-gray-100';
     }
   };
 
@@ -394,7 +397,7 @@ const Dashboard = () => {
       </div>
 
       {/* Bottom Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         {/* Top Technicians */}
         <div className="page-card p-6">
           <div className="flex items-center justify-between mb-6">
@@ -486,6 +489,11 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Case Analytics Chart */}
+        <div className="lg:col-span-2">
+          <CaseChart />
         </div>
       </div>
     </div>

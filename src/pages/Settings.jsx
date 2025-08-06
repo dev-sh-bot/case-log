@@ -185,8 +185,7 @@ const Settings = () => {
                         <button
                             onClick={handleSaveSettings}
                             disabled={isSaving}
-                            className="flex items-center px-4 py-2 text-white rounded-lg transition-colors disabled:opacity-50"
-                            style={{ backgroundColor: '#0B1F3A' }}
+                            className="flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
                         >
                             <FaSave className="mr-2" size={14} />
                             {isSaving ? 'Saving...' : 'Save Changes'}

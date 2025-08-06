@@ -8,8 +8,8 @@ import Header from './Header';
 
 TopBarProgress.config({
   barColors: {
-    "0": "#0B1F3A",
-    "1.0": "#122B45"
+    "0": "#3B82F6",
+    "1.0": "#2563EB"
   },
   shadowBlur: 5,
 });

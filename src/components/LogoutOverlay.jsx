@@ -16,7 +16,7 @@ const LogoutOverlay = () => {
                     visible={true}
                     height="80"
                     width="80"
-                    colors={['#8484c1', "#8484c1", "#8484c1", "#8484c1", "#8484c1"]}
+                    colors={['#3B82F6', "#2563EB", "#1D4ED8", "#1E40AF", "#1E3A8A"]}
                 />
                 <div className="text-center">
                     <h2 className="text-xl font-semibold text-gray-900 mb-2">

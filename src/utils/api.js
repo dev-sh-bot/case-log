@@ -108,6 +108,11 @@ export const api = {
   async createNotification(notificationData) {
     return await apiClient.post('admin/notifications', notificationData);
   },
+
+  // Case Graph Data
+  async getCaseGraphData(type) {
+    return await apiClient.get(`admin/case-graph?type=${type}`);
+  },
 };
 
 export default api;

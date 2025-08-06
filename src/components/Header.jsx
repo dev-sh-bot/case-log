@@ -67,7 +67,7 @@ const Header = () => {
                 <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-100 dark:bg-facebook-surface">
                   <span className="relative">
                     <GoBellFill size={25} className="text-gray-700 dark:text-facebook-textSecondary" />
-                    <span className="w-4 h-4 text-white flex items-center justify-center text-[8px] bg-red-500 rounded-full absolute -top-[6px] -right-[2px] ">10</span>
+                    <span className="w-4 h-4 text-white flex items-center justify-center text-[8px] bg-red-500 dark:bg-red-600 rounded-full absolute -top-[6px] -right-[2px] ">10</span>
                   </span>
                 </div>
               }
@@ -76,7 +76,7 @@ const Header = () => {
             {/* User Profile Dropdown */}
             <DropdownMenu
               menuButtonLabel={
-                <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-sm bg-primary-800 dark:bg-facebook-surface">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-sm bg-blue-600 dark:bg-facebook-surface">
                   <FaRegUser size={20} className="text-white dark:text-facebook-text" />
                 </div>
               }
