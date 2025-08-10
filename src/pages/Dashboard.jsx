@@ -6,12 +6,12 @@ import {
   FaExclamationTriangle, 
   FaClipboardList,
   FaChartBar,
-  FaArrowUp,
-  FaSpinner
+  FaArrowUp
 } from 'react-icons/fa';
 import { api } from '../utils/api';
 import { triggerToast } from '../utils/helper';
 import CaseChart from '../components/CaseChart';
+import { PageLoader } from '../components/Loaders';
 
 const Dashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('week');
@@ -239,16 +239,7 @@ const Dashboard = () => {
 
   // Loading state
   if (loading) {
-    return (
-      <div className="page-section">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <FaSpinner className="animate-spin mx-auto mb-4 text-blue-600" size={40} />
-            <p className="text-gray-600 dark:text-facebook-textSecondary">Loading dashboard data...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <PageLoader message="Loading dashboard data..." />;
   }
 
   // Error state

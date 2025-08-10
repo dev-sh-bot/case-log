@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { addUser } from '../reducers/authSlice';
 import { useNavigate } from 'react-router-dom';
-import { ColorRing } from 'react-loader-spinner';
 import LOGO from '../assets/images/icons.png';
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 import { triggerToast } from '../utils/helper';
 import { api } from '../utils/api';
+import { ButtonLoader } from '../components/Loaders';
 
 const Login = () => {
     const {
@@ -77,7 +77,7 @@ const Login = () => {
                                 className="w-full py-3 px-4 mt-2 text-sm bg-gray-50 dark:bg-facebook-surface border border-gray-300 dark:border-facebook-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-facebook-text placeholder-gray-500 dark:placeholder-facebook-textMuted"
                                 placeholder="Enter your password"
                             />
-                            <button type="button" onClick={togglePasswordVisibility} className="absolute top-5 md:top-7 right-3 -translate-y-1/2 text-gray-500 dark:text-facebook-textSecondary">
+                            <button type="button" onClick={togglePasswordVisibility} className="absolute top-5 right-3 text-gray-500 dark:text-facebook-textSecondary hover:text-gray-700 dark:hover:text-facebook-text transition-colors">
                                 {showPassword ? <MdVisibilityOff size="1.3em" /> : <MdVisibility size="1.3em" />}
                             </button>
                         </div>
@@ -85,17 +85,11 @@ const Login = () => {
                     </div>
 
                     <button type="submit" disabled={isSubmitting} className="w-full py-3 text-base font-medium text-white rounded-lg transition disabled:opacity-50 flex items-center justify-center mt-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-600 dark:to-blue-700 shadow-lg hover:shadow-xl">
-                        {isSubmitting ?
-                            <ColorRing
-                                visible={true}
-                                height="24"
-                                width="24"
-                                colors={['#3B82F6', "#2563EB", "#1D4ED8", "#1E40AF", "#1E3A8A"]}
-                                wrapperStyle={{ margin: "0 auto" }}
-                            />
-                            :
+                        {isSubmitting ? (
+                            <ButtonLoader text="Signing In..." />
+                        ) : (
                             <>Sign In</>
-                        }
+                        )}
                     </button>
                 </form>
 

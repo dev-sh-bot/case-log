@@ -11,7 +11,7 @@ const LogoutOverlay = () => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-8 flex flex-col items-center space-y-4">
+            <div className="bg-white dark:bg-facebook-card rounded-lg p-8 flex flex-col items-center space-y-4">
                 <ColorRing
                     visible={true}
                     height="80"
@@ -19,10 +19,10 @@ const LogoutOverlay = () => {
                     colors={['#3B82F6', "#2563EB", "#1D4ED8", "#1E40AF", "#1E3A8A"]}
                 />
                 <div className="text-center">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-facebook-text mb-2">
                         Logging Out
                     </h2>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-facebook-textSecondary">
                         Please wait while we securely log you out...
                     </p>
                 </div>

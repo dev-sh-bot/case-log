@@ -10,9 +10,10 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
+import { FaExclamationTriangle } from 'react-icons/fa';
 import { api } from '../utils/api';
 import { triggerToast } from '../utils/helper';
+import { WidgetLoader } from './Loaders';
 
 ChartJS.register(
   CategoryScale,
@@ -188,12 +189,7 @@ const CaseChart = () => {
 
       <div className="h-80">
         {loading && (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <FaSpinner className="animate-spin mx-auto mb-4 text-blue-600" size={32} />
-              <p className="text-gray-600 dark:text-facebook-textSecondary">Loading chart data...</p>
-            </div>
-          </div>
+          <WidgetLoader message="Loading chart data..." height="80" />
         )}
 
         {error && (

@@ -5,6 +5,7 @@ import { triggerToast } from '../utils/helper';
 import { api } from '../utils/api';
 import { itemsPerPage } from '../utils/constants';
 import Pagination from '../components/Pagination';
+import { TableLoader, ButtonLoader } from '../components/Loaders';
 
 const TechniciansList = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -295,10 +296,7 @@ const TechniciansList = () => {
                 className="flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg transition-all disabled:opacity-50 shadow-md hover:shadow-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
               >
                 {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Creating...
-                  </>
+                  <ButtonLoader text="Creating..." />
                 ) : (
                   <>
                     <FaSave className="mr-2" />
@@ -389,12 +387,7 @@ const TechniciansList = () => {
             </thead>
             <tbody className="bg-white dark:bg-facebook-card divide-y divide-gray-200 dark:divide-facebook-border">
               {loading ? (
-                <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500 dark:text-facebook-textSecondary">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                    <p className="text-lg font-medium text-gray-700 dark:text-facebook-text">Loading technicians...</p>
-                  </td>
-                </tr>
+                <TableLoader columns={5} message="Loading technicians..." />
               ) : technicians.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="px-6 py-12 text-center text-gray-500 dark:text-facebook-textSecondary">

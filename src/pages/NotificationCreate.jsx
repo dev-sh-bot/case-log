@@ -1,34 +1,53 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { FaBell, FaSave } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { FaBell, FaSave, FaUsers, FaGlobe } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
 import { triggerToast } from '../utils/helper';
+import CustomSelect from '../components/Select';
+import { InlineLoader, ButtonLoader } from '../components/Loaders';
 
 const NotificationCreate = () => {
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [managers, setManagers] = useState([]);
+    const [isLoadingManagers, setIsLoadingManagers] = useState(false);
 
     const {
         register,
         handleSubmit,
         formState: { errors },
-        reset
+        reset,
+        watch,
+        control
     } = useForm({
         defaultValues: {
             title: '',
-            description: ''
+            description: '',
+            type: 'all',
+            manager_ids: []
         }
     });
+
+    const watchType = watch('type');
 
     const onSubmit = async (data) => {
         setIsSubmitting(true);
         try {
-            const response = await api.createNotification(data);
+            const payload = {
+                title: data.title,
+                description: data.description,
+                type: data.type
+            };
+            
+            if (data.type === 'specific' && data.manager_ids && data.manager_ids.length > 0) {
+                payload.manager_ids = data.manager_ids;
+            }
+            
+            const response = await api.createNotification(payload);
             if (response) {
                 triggerToast('Notification created successfully!', 'success');
                 reset();
-                navigate(-1);
             } else {
                 throw new Error('Failed to create notification');
             }
@@ -43,6 +62,25 @@ const NotificationCreate = () => {
     const handleCancel = () => {
         navigate(-1);
     };
+
+    const fetchManagers = async () => {
+        setIsLoadingManagers(true);
+        try {
+            const response = await api.getManagerList();
+            setManagers(response || []);
+        } catch (error) {
+            console.error('Failed to fetch managers:', error);
+            triggerToast('Failed to fetch managers list', 'error');
+        } finally {
+            setIsLoadingManagers(false);
+        }
+    };
+
+    useEffect(() => {
+        if (watchType === 'specific') {
+            fetchManagers();
+        }
+    }, [watchType]);
 
     return (
         <div className="page-section">
@@ -117,6 +155,115 @@ const NotificationCreate = () => {
                         </p>
                     </div>
 
+                    {/* Type Field */}
+                    <div>
+                        <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-facebook-text mb-2">
+                            Notification Type <span className="text-red-500">*</span>
+                        </label>
+                        <div className="grid grid-cols-2 gap-4">
+                            <label className="relative cursor-pointer">
+                                <input
+                                    type="radio"
+                                    {...register('type', { required: 'Please select a notification type' })}
+                                    value="all"
+                                    className="sr-only"
+                                />
+                                <div className={`flex items-center justify-center p-4 border rounded-lg transition-all ${
+                                    watchType === 'all'
+                                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
+                                        : 'border-gray-300 dark:border-facebook-border bg-white dark:bg-facebook-surface hover:bg-gray-50 dark:hover:bg-facebook-hover'
+                                }`}>
+                                    <FaGlobe className="mr-3 text-lg dark:text-white" />
+                                    <div className="text-center">
+                                        <div className="font-medium dark:text-white">All Managers</div>
+                                        <div className="text-sm text-gray-500 dark:text-facebook-textMuted">Send to everyone</div>
+                                    </div>
+                                </div>
+                            </label>
+                            <label className="relative cursor-pointer">
+                                <input
+                                    type="radio"
+                                    {...register('type', { required: 'Please select a notification type' })}
+                                    value="specific"
+                                    className="sr-only"
+                                />
+                                <div className={`flex items-center justify-center p-4 border rounded-lg transition-all ${
+                                    watchType === 'specific'
+                                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
+                                        : 'border-gray-300 dark:border-facebook-border bg-white dark:bg-facebook-surface hover:bg-gray-50 dark:hover:bg-facebook-hover'
+                                }`}>
+                                    <FaUsers className="mr-3 text-lg dark:text-white" />
+                                    <div className="text-center">
+                                        <div className="font-medium dark:text-white">Specific Managers</div>
+                                        <div className="text-sm text-gray-500 dark:text-facebook-textMuted">Select recipients</div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                        {errors.type && (
+                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.type.message}</p>
+                        )}
+                    </div>
+
+                    {/* Manager Selection - Only show when type is 'specific' */}
+                    {watchType === 'specific' && (
+                        <div>
+                            <label htmlFor="manager_ids" className="block text-sm font-medium text-gray-700 dark:text-facebook-text mb-2">
+                                Select Managers <span className="text-red-500">*</span>
+                            </label>
+                            {isLoadingManagers ? (
+                                <div className="p-4 border border-gray-300 dark:border-facebook-border rounded-lg bg-white dark:bg-facebook-surface">
+                                    <InlineLoader text="Loading managers..." />
+                                </div>
+                            ) : managers.length > 0 ? (
+                                <Controller
+                                    name="manager_ids"
+                                    control={control}
+                                    rules={{
+                                        validate: (value) => {
+                                            if (watchType === 'specific' && (!value || value.length === 0)) {
+                                                return 'Please select at least one manager';
+                                            }
+                                            return true;
+                                        }
+                                    }}
+                                    render={({ field }) => (
+                                        <CustomSelect
+                                            {...field}
+                                            isMulti={true}
+                                            options={managers.map(manager => ({
+                                                value: manager.id,
+                                                label: `${manager.name} (${manager.email})`
+                                            }))}
+                                            placeholder="Select managers..."
+                                            value={field.value ? managers
+                                                .filter(manager => field.value.includes(manager.id))
+                                                .map(manager => ({
+                                                    value: manager.id,
+                                                    label: `${manager.name} (${manager.email})`
+                                                })) : []
+                                            }
+                                            onChange={(selectedOptions) => {
+                                                const values = selectedOptions ? selectedOptions.map(option => option.value) : [];
+                                                field.onChange(values);
+                                            }}
+                                        />
+                                    )}
+                                />
+                            ) : (
+                                <div className="flex items-center justify-center p-4 border border-gray-300 dark:border-facebook-border rounded-lg bg-white dark:bg-facebook-surface">
+                                    <span className="text-gray-500 dark:text-facebook-textMuted">No managers found</span>
+                                </div>
+                            )}
+                            <p className="mt-2 text-xs text-gray-500 dark:text-facebook-textMuted">
+                                You can select multiple managers from the dropdown
+                            </p>
+                            {errors.manager_ids && (
+                                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.manager_ids.message}</p>
+                            )}
+                        </div>
+                    )}
+
                     {/* Action Buttons */}
                     <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-facebook-border">
                         <button
@@ -129,13 +276,10 @@ const NotificationCreate = () => {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg transition-all disabled:opacity-50 shadow-md hover:shadow-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                            className="flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg transition-all disabled:opacity-50 shadow-md hover:shadow-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700"
                         >
                             {isSubmitting ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                    Creating...
-                                </>
+                                <ButtonLoader text="Creating..." />
                             ) : (
                                 <>
                                     <FaSave className="mr-2" />
