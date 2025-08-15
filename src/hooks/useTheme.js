@@ -17,14 +17,5 @@ export const useTheme = () => {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  // Apply theme on mount
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]); // Include theme dependency
-
   return theme;
 }; 
