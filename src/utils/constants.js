@@ -1,6 +1,6 @@
 export const APP_URL = "http://localhost:3000/";
-export const API_URL = "https://caselog.techvince.com/api/";
-export const ASSETS_URL = "https://caselog.techvince.com/"
+export const API_URL = "https://caselog.emdakk.com/api/";
+export const ASSETS_URL = "https://caselog.emdakk.com/"
 export const itemsPerPage = 25;
 
 export const dummyOptions = [
