@@ -1,7 +1,17 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useTransition } from 'react';
 import { FaHome, FaArrowLeft } from 'react-icons/fa';
 
 const NotFound = () => {
+  const navigate = useNavigate();
+  const [isPending, startTransition] = useTransition();
+
+  const goHome = () => {
+    startTransition(() => {
+      navigate('/');
+    });
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-facebook-dark dark:to-slate-800 px-4">
       <div className="max-w-md w-full text-center">
@@ -61,13 +71,14 @@ const NotFound = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            to="/"
+          <button
+            onClick={goHome}
+            disabled={isPending}
             className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg shadow-md hover:shadow-lg transition-all"
           >
             <FaHome className="mr-2" />
             Go Home
-          </Link>
+          </button>
           
           <button
             onClick={() => window.history.back()}

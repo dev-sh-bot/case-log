@@ -10,7 +10,6 @@ import {
   FaChevronRight,
   FaChevronUp,
   FaChevronDown,
-  FaCog,
   FaUserTie,
   FaTools,
   FaBell,
@@ -40,11 +39,6 @@ const menuItems = [
     title: "Notifications",
     path: "/notifications/create",
     icon: <FaBell />,
-  },
-  {
-    title: "Settings",
-    path: "/settings",
-    icon: <FaCog />,
   },
 ]
 
@@ -177,12 +171,11 @@ export default function Sidebar({ isExpanded, setIsExpanded }) {
         `}
       >
         <div className="flex items-center justify-center">
-          <img 
-            src={logo} 
-            alt="Logo" 
-            className={`object-contain transition-all duration-300 filter brightness-90 contrast-110 saturate-125 hover:brightness-100 hover:contrast-125 dark:brightness-200 dark:contrast-150 dark:saturate-150 dark:hover:brightness-250 dark:hover:contrast-175 ${
-              isExpanded ? 'w-40' : 'w-10'
-            }`} 
+          <img
+            src={logo}
+            alt="Logo"
+            className={`object-contain transition-all duration-300 filter brightness-90 contrast-110 saturate-125 hover:brightness-100 hover:contrast-125 dark:brightness-200 dark:contrast-150 dark:saturate-150 dark:hover:brightness-250 dark:hover:contrast-175 ${isExpanded ? 'w-40' : 'w-10'
+              }`}
           />
         </div>
       </div>

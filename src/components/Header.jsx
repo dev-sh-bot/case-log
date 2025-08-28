@@ -19,11 +19,6 @@ const Header = () => {
 
   const dummyOptions = [
     {
-      label: "Profile",
-      type: "link",
-      href: "/profile",
-    },
-    {
       label: "Logout",
       type: "button",
       action: () => {

@@ -15,7 +15,6 @@ const Dashboard = React.lazy(() => import("./pages/Dashboard"));
 const Login = React.lazy(() => import("./pages/Login"));
 const ManagersList = React.lazy(() => import("./pages/ManagersList"));
 const TechniciansList = React.lazy(() => import("./pages/TechniciansList"));
-const Settings = React.lazy(() => import("./pages/Settings"));
 const NotificationCreate = React.lazy(() => import("./pages/NotificationCreate"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
@@ -63,21 +62,6 @@ const router = createBrowserRouter([
     ),
     handle: {
       title: "Technicians"
-    }
-  },
-  {
-    path: "/settings",
-    element: (
-      <ProtectedRoute>
-        <Layout>
-          <React.Suspense fallback={<LoadingSpinner />}>
-            <Settings />
-          </React.Suspense>
-        </Layout>
-      </ProtectedRoute>
-    ),
-    handle: {
-      title: "Settings"
     }
   },
   {
