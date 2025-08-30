@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 
 const StatCard = ({ icon, title, value, color }) => {
   const colorClasses = {
-    red: 'from-red-500 to-red-600',
-    blue: 'from-blue-500 to-blue-600',
-    purple: 'from-purple-500 to-purple-600',
-    green: 'from-green-500 to-green-600',
+    red: 'from-red-400 to-red-500',
+    blue: 'from-blue-400 to-blue-500',
+    purple: 'from-purple-400 to-purple-500',
+    green: 'from-green-400 to-green-500',
   };
 
   return (
