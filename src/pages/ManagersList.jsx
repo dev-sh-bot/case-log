@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { FaPlus, FaSearch, FaUserTie, FaSave } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaUserTie, FaSave, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { triggerToast } from '../utils/helper';
 import { api } from '../utils/api';
 import { itemsPerPage } from '../utils/constants';
@@ -25,13 +25,13 @@ const ManagersList = () => {
         page: page.toString(),
         per_page: itemsPerPage.toString()
       });
-      
+
       if (search) {
         queryParams.append('search', search);
       }
-      
+
       const response = await api.getManagers(queryParams.toString());
-      
+
       // Handle Laravel pagination response structure
       if (response && response.data) {
         setManagers(response.data || []);
@@ -72,6 +72,7 @@ const ManagersList = () => {
 
   const AddManagerModal = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const {
       register,
@@ -102,7 +103,7 @@ const ManagersList = () => {
         } else {
           // Add new manager
           const response = await api.createManager(data);
-          if (response && response.data) {
+          if (response && response?.id) {
             triggerToast('Manager created successfully', 'success');
             // Refresh the managers list
             fetchManagers(currentPage, searchTerm);
@@ -193,24 +194,38 @@ const ManagersList = () => {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-facebook-text mb-2">
                   Password *
                 </label>
-                <input
-                  type="password"
-                  id="password"
-                  {...register('password', {
-                    required: 'Password is required',
-                    minLength: {
-                      value: 8,
-                      message: 'Password must be at least 8 characters'
-                    },
-                    pattern: {
-                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                      message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number'
-                    }
-                  })}
-                  className={`block w-full px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-facebook-surface text-gray-900 dark:text-facebook-text ${errors.password ? 'border-red-300 dark:border-red-500' : 'border-gray-300 dark:border-facebook-border'
-                    }`}
-                  placeholder="Enter password"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    {...register('password', {
+                      required: 'Password is required',
+                      minLength: {
+                        value: 8,
+                        message: 'Password must be at least 8 characters'
+                      },
+                      pattern: {
+                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+                        message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+                      }
+                    })}
+                    className={`block w-full px-3 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-facebook-surface text-gray-900 dark:text-facebook-text ${errors.password ? 'border-red-300 dark:border-red-500' : 'border-gray-300 dark:border-facebook-border'
+                      }`}
+                    placeholder="Enter password"
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <FaEyeSlash className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    ) : (
+                      <FaEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    )}
+                  </button>
+                </div>
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
                 )}
